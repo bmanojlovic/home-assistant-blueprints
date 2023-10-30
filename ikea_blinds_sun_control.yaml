@@ -1,0 +1,30 @@
+blueprint:
+  name: IKEA FYRTUR Blinds Sun-based Control
+  description: Control the IKEA FYRTUR blinds based on sun events.
+  domain: automation
+  input:
+    blind_entity:
+      name: Blind
+      description: The IKEA FYRTUR blind to control.
+      selector:
+        entity:
+          domain: cover
+          integration: zha
+
+trigger:
+  - platform: sun
+    event: sunrise
+    offset: "00:15:00"
+  - platform: sun
+    event: sunset
+    offset: "-00:20:00"
+
+action:
+  - service: >
+      {% if trigger.platform == 'sun' and trigger.event == 'sunrise' %}
+        cover.open_cover
+      {% else %}
+        cover.close_cover
+      {% endif %}
+    target:
+      entity_id: !input blind_entity
